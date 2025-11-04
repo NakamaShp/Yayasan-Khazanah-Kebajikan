@@ -1,4 +1,4 @@
-import { AboutSection } from "@/components/sections/About";
+import { AboutSection } from "@/components/pages/About";
 import HeaderPage from "@/components/sections/HeaderPage";
 import LazySection from "@/components/utils/LazySection";
 

@@ -1,15 +1,15 @@
-import ContactSection from "@/components/sections/Contact";
+import { GallerySection } from "@/components/pages/Gallery";
 import HeaderPage from "@/components/sections/HeaderPage";
 import LazySection from "@/components/utils/LazySection";
 
-export default function ContactPage() {
+export default function GaleriPage() {
   return (
     <>
-        <>
-          <HeaderPage />
-        </>
+      <>
+        <HeaderPage />
+      </>
       <LazySection>
-        <ContactSection />
+        <GallerySection />
       </LazySection>
     </>
   );
