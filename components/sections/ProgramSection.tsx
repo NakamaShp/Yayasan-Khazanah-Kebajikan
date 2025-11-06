@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Heart, BookOpen, Users } from "lucide-react"
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Heart, BookOpen, Users } from "lucide-react";
 
 const programs = [
   {
@@ -24,11 +24,11 @@ const programs = [
     desc: "Pelatihan kewirausahaan dan ekonomi kreatif untuk mendukung kemandirian umat.",
     link: "/program/pemberdayaan",
   },
-]
+];
 
 export default function ProgramPreview() {
   return (
-    <section className="py-24 bg-gradient-to-b from-blue-50 to-white">
+    <section className="py-24 bg-white">
       <div className="container mx-auto px-6 text-center">
         <motion.h2
           initial={{ opacity: 0, y: 30 }}
@@ -50,7 +50,9 @@ export default function ProgramPreview() {
               className="bg-white shadow-lg rounded-2xl p-8 text-left border border-gray-100 hover:shadow-xl transition-all duration-300"
             >
               <div className="mb-5">{item.icon}</div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-3">{item.title}</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-3">
+                {item.title}
+              </h3>
               <p className="text-gray-600 mb-5">{item.desc}</p>
               <Button asChild variant="outline" className="rounded-full">
                 <Link href={item.link}>Selengkapnya</Link>
@@ -60,5 +62,5 @@ export default function ProgramPreview() {
         </div>
       </div>
     </section>
-  )
+  );
 }

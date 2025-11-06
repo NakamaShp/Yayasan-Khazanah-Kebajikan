@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 
 const navItems = [
   { name: "Beranda", href: "/" },
-  { name: "Tentang", href: "/tentang" },
+  { name: "Tentang Kami", href: "/tentang" },
   {
     name: "Program",
     href: "#",
@@ -28,10 +28,23 @@ const navItems = [
 export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = (name: string) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setActiveDropdown(name);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setActiveDropdown(null);
+    }, 250); // delay 250ms sebelum dropdown ditutup
+  };
 
   return (
     <header className="px-4 sm:px-10 fixed top-0 left-0 w-full z-50 backdrop-blur-lg bg-white/50 border-b border-white/20 shadow-sm">
-      <div className="max-w-7xl mx-auto flex justify-between items-center  md:px-8 py-3">
+      <div className="max-w-7xl mx-auto flex justify-between items-center md:px-8 py-3">
         {/* 🔹 Logo */}
         <Link href="/" className="flex items-center gap-2">
           <motion.span
@@ -46,21 +59,37 @@ export default function Navbar() {
         {/* 🔹 Menu Desktop */}
         <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item) => (
-            <div key={item.name} className="relative group cursor-pointer">
+            <div
+              key={item.name}
+              className="relative"
+              onMouseEnter={() => handleMouseEnter(item.name)}
+              onMouseLeave={handleMouseLeave}
+            >
               {item.dropdown ? (
                 <>
                   <div
-                    className={`flex items-center gap-1 font-medium transition-colors ${
+                    className={`flex items-center gap-1 font-medium cursor-pointer transition-colors ${
                       pathname === item.href
                         ? "text-blue-600"
                         : "text-gray-700 hover:text-blue-600"
                     }`}
                   >
                     {item.name}
-                    <ChevronDown className="w-4 h-4 mt-[1px] transition-transform group-hover:rotate-180" />
+                    <ChevronDown
+                      className={`w-4 h-4 mt-[1px] transition-transform ${
+                        activeDropdown === item.name ? "rotate-180" : ""
+                      }`}
+                    />
                   </div>
-                  {/* Hover Dropdown */}
-                  <div className="absolute left-0 mt-2 hidden group-hover:block w-48 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden transition-all duration-500">
+
+                  {/* 🔹 Dropdown Menu */}
+                  <div
+                    className={`absolute left-0 mt-2 w-52 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden transition-all duration-300 ${
+                      activeDropdown === item.name
+                        ? "opacity-100 translate-y-0 visible"
+                        : "opacity-0 -translate-y-2 invisible"
+                    }`}
+                  >
                     <div className="flex flex-col">
                       {item.subItems?.map((sub) => (
                         <Link

@@ -8,7 +8,7 @@ export default function HeroSection() {
   return (
     <section
       id="beranda"
-      className="relative overflow-hidden flex flex-col items-center justify-center text-center py-20 md:py-32 bg-gradient-to-b from-blue-50 via-white to-blue-100"
+      className="relative overflow-hidden flex flex-col items-center justify-center text-center py-20 md:py-32 bg-white"
     >
       {/* Ornamen blur modern */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] md:w-[500px] md:h-[500px] bg-blue-200/40 blur-3xl rounded-full -z-10" />
