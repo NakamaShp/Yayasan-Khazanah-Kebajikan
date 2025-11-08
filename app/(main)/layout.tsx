@@ -15,8 +15,8 @@ export default function MainLayout({
           <NavMain />
 
           {/* Konten Utama */}
-          <main className="flex-grow">{children}</main>
-          <Toaster richColors position="top-right" />
+          <main className="grow">{children}</main>
+          <Toaster richColors position="top-center" />
 
           {/* Footer */}
           <Footer />

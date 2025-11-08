@@ -2,14 +2,12 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -28,7 +26,7 @@ interface Berita {
   id: string;
   judul: string;
   slug: string;
-  excerpt?: string;
+
   isi?: string;
   thumbnail?: string;
   kategori?: string;
@@ -39,6 +37,7 @@ interface Berita {
 }
 
 export default function BeritaPage() {
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [beritas, setBeritas] = useState<Berita[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -91,7 +90,7 @@ export default function BeritaPage() {
       if (!s) return true;
       return (
         (b.judul ?? "").toLowerCase().includes(s) ||
-        (b.excerpt ?? "").toLowerCase().includes(s) ||
+
         (b.isi ?? "").toLowerCase().includes(s)
       );
     });
@@ -168,7 +167,7 @@ export default function BeritaPage() {
             {featured.map((it) => (
               <Card key={it.id} className="h-full hover:shadow-lg transition">
                 <CardHeader className="p-0">
-                  {it.thumbnail ? (
+                  {it.thumbnail && typeof it.thumbnail === 'string' && (it.thumbnail.startsWith('http') || it.thumbnail.startsWith('/')) ? (
                     <div className="h-44 w-full relative overflow-hidden rounded-t-md">
                       <Image
                         src={it.thumbnail}
@@ -190,9 +189,7 @@ export default function BeritaPage() {
                     <h3 className="text-lg font-bold line-clamp-2">
                       {it.judul}
                     </h3>
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                      {it.excerpt}
-                    </p>
+                   
                   </div>
                   <div className="flex items-center justify-between mt-4">
                     <div className="text-xs text-muted-foreground">
@@ -256,9 +253,7 @@ export default function BeritaPage() {
                     <h3 className="text-lg font-semibold mb-1 line-clamp-2">
                       {it.judul}
                     </h3>
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {it.excerpt}
-                    </p>
+                    
                   </div>
                 </CardContent>
 

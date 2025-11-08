@@ -1,13 +1,21 @@
-import { heroui } from "@heroui/react";
+// tailwind.config.js
 
-export default {
+import { heroui } from "@heroui/react";
+import typography from '@tailwindcss/typography';
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
+    // Path ini sudah benar untuk memindai kelas dari HeroUI
     "./node_modules/@heroui/react/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {}
   },
-  plugins: [heroui()],
+  plugins: [
+    heroui(),
+    typography,
+  ]
 };

@@ -4,15 +4,41 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { useEffect, useMemo, useState } from "react"
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
-const gallery = [
-  "/images/galeri1.jpg",
-  "/images/galeri2.jpg",
-  "/images/galeri3.jpg",
-  "/images/galeri4.jpg",
-]
+
 
 export default function GaleriPreview() {
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+
+   const [images, setImages] = useState<string[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+  
+    useEffect(() => {
+      let mounted = true;
+      const fetchBerita = async () => {
+        setLoading(true);
+        const {data, error} = await supabase
+        .from("berita")
+        .select("thumbnail")
+        .order("created_at", {ascending: false})
+  
+      if (error) {
+        console.error("Error fetching Images:", error);
+        setImages([]);
+      }else if(mounted){
+        setImages(data.map((item) => item.thumbnail));
+      };
+      setLoading(false);
+    };
+      fetchBerita();
+  
+      return () => {
+        mounted = false;
+      }
+    }, []);
+
   return (
     <section className="py-24 bg-white">
       <div className="container mx-auto px-6 text-center">
@@ -26,7 +52,7 @@ export default function GaleriPreview() {
         </motion.h2>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {gallery.map((src, i) => (
+          {images.map((src, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, scale: 0.95 }}

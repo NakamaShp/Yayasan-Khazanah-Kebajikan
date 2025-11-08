@@ -1,166 +1,149 @@
-"use client";
+"use client"
 
-import * as React from "react";
+import * as React from "react"
+// 1. Import hook 'usePathname'
+import { usePathname } from "next/navigation" 
 import {
-  ArrowUpCircleIcon,
-  BarChartIcon,
-  CameraIcon,
-  ClipboardListIcon,
-  DatabaseIcon,
-  FileCodeIcon,
-  FileIcon,
-  FileTextIcon,
-  FolderIcon,
-  HelpCircleIcon,
-  LayoutDashboardIcon,
-  ListIcon,
-  SearchIcon,
-  SettingsIcon,
-  UsersIcon,
-} from "lucide-react";
+  AudioWaveform,
+  Bot,
+  Command,
+  Frame,
+  GalleryVerticalEnd,
+  LayoutDashboard,
+  Map,
+  Newspaper,
+  PieChart,
+  Settings2,
+} from "lucide-react"
 
-import { NavDocuments } from "@/components/nav-documents";
-import { NavMain } from "@/components/nav-main";
-import { NavSecondary } from "@/components/nav-secondary";
-import { NavUser } from "@/components/nav-user";
+import { NavMain } from "@/components/nav-main"
+import { NavProjects } from "@/components/nav-projects"
+import { NavUser } from "@/components/nav-user"
+import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
+  SidebarRail,
+} from "@/components/ui/sidebar"
 
+// Ini adalah sample data Anda
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "Admin", // Ganti sesuai kebutuhan
+    email: "admin@example.com",
+    avatar: "/avatars/placeholder.png", // Ganti dengan placeholder atau avatar admin
   },
+  teams: [
+    {
+      name: "Khazanah Kebajikan", // Sesuaikan
+      logo: GalleryVerticalEnd,
+      plan: "Admin",
+    },
+  ],
+  // Data navigasi utama
   navMain: [
     {
       title: "Dashboard",
       url: "/dashboard",
-      icon: LayoutDashboardIcon,
+      icon: LayoutDashboard,
+      // Hapus 'isActive' yang di-hardcode
     },
     {
       title: "Berita",
-      url: "/admin/berita",
-      icon: ListIcon,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: CameraIcon,
-      isActive: true,
-      url: "#",
+      url: "/dashboard/berita", // Ini adalah URL 'parent'
+      icon: Newspaper,
       items: [
         {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
+          title: "Buat Berita",
+          url: "/dashboard/berita/create", // Ini adalah 'child'
         },
       ],
     },
-    {
-      title: "Proposal",
-      icon: FileTextIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: FileCodeIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
     {
       title: "Settings",
-      url: "#",
-      icon: SettingsIcon,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: HelpCircleIcon,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: SearchIcon,
+      url: "/dashboard/settings", // Beri URL yang valid
+      icon: Settings2,
     },
   ],
-  documents: [
+  // Hapus data 'projects' jika tidak relevan
+  projects: [
     {
-      name: "Data Library",
-      url: "#",
-      icon: DatabaseIcon,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: ClipboardListIcon,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: FileIcon,
+      name: "Lihat Situs Publik",
+      url: "/", // Link ke halaman utama publik
+      icon: Frame,
     },
   ],
-};
+}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  // 2. Dapatkan path URL saat ini
+  const pathname = usePathname()
+
+  // 3. Proses 'navMain' untuk menentukan 'isActive' secara dinamis
+  const processedNavMain = React.useMemo(() => {
+    
+    // Logika untuk menemukan item yang paling cocok
+    // Misal: URL = "/dashboard/berita/create"
+    // "/dashboard" -> cocok
+    // "/dashboard/berita" -> cocok (lebih spesifik)
+    // "/dashboard/berita/create" -> tidak ada di nav, jadi '/dashboard/berita' adalah yg terbaik
+    
+    let bestMatchUrl = "";
+    
+    const checkUrls = (items: typeof data.navMain) => {
+      items.forEach((item) => {
+        // Cek apakah URL saat ini *dimulai dengan* URL item
+        if (pathname.startsWith(item.url) && item.url.length > 0) {
+          // Jika item ini lebih cocok (lebih panjang) dari bestMatch sebelumnya
+          if (item.url.length > bestMatchUrl.length) {
+            bestMatchUrl = item.url;
+          }
+        }
+        // Rekursif cek sub-items jika ada
+        if (item.items) {
+           checkUrls(item.items.map(sub => ({...sub, icon: item.icon})));
+        }
+      });
+    }
+    
+    checkUrls(data.navMain);
+
+    // Buat ulang array dengan 'isActive' yang benar
+    return data.navMain.map((item) => {
+      // Item parent dianggap aktif jika URL-nya adalah bestMatch
+      // ATAU jika salah satu anaknya adalah bestMatch
+      const isParentActive = item.url === bestMatchUrl || 
+        (item.items && item.items.some(sub => sub.url === bestMatchUrl));
+        
+      return {
+        ...item,
+        isActive: isParentActive,
+        // Proses sub-items juga
+        items: item.items ? item.items.map(subItem => ({
+          ...subItem,
+          isActive: subItem.url === bestMatchUrl
+        })) : undefined
+      };
+    });
+  }, [pathname]); // Akan dihitung ulang setiap kali URL (pathname) berubah
+
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <a href="#">
-                <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        {/* 4. Gunakan data yang sudah diproses */}
+        <NavMain items={processedNavMain} />
+        <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
+        {/* 5. NavUser sekarang akan punya tombol Logout */}
         <NavUser user={data.user} />
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export type Berita = {
   id: string;
@@ -13,6 +13,7 @@ export type Berita = {
 
 // 🔹 Ambil semua berita
 export async function getAllBerita() {
+  const supabase = createSupabaseBrowserClient();
   const { data, error } = await supabase
     .from("berita")
     .select("*")
@@ -24,6 +25,7 @@ export async function getAllBerita() {
 
 // 🔹 Ambil berita unggulan
 export async function getBeritaUnggulan() {
+  const supabase = createSupabaseBrowserClient();
   const { data, error } = await supabase
     .from("berita")
     .select("*")
@@ -36,6 +38,7 @@ export async function getBeritaUnggulan() {
 
 // 🔹 Ambil berita berdasarkan slug
 export async function getBeritaBySlug(slug: string) {
+  const supabase = createSupabaseBrowserClient();
   const { data, error } = await supabase
     .from("berita")
     .select("*")
@@ -48,18 +51,21 @@ export async function getBeritaBySlug(slug: string) {
 
 // 🔹 Tambah berita
 export async function tambahBerita(berita: Omit<Berita, "id" | "created_at">) {
+  const supabase = createSupabaseBrowserClient();
   const { error } = await supabase.from("berita").insert([berita]);
   if (error) throw error;
 }
 
 // 🔹 Update berita
 export async function updateBerita(id: string, berita: Partial<Berita>) {
+  const supabase = createSupabaseBrowserClient();
   const { error } = await supabase.from("berita").update(berita).eq("id", id);
   if (error) throw error;
 }
 
 // 🔹 Hapus berita
 export async function hapusBerita(id: string) {
+  const supabase = createSupabaseBrowserClient();
   const { error } = await supabase.from("berita").delete().eq("id", id);
   if (error) throw error;
 }

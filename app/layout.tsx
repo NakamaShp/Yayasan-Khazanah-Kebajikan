@@ -30,14 +30,12 @@ export default function RootLayout({
       >
         <div className="flex flex-col min-h-screen">
           {/* Navbar */}
-        
-          
+
           {/* Konten Utama */}
-          <main className="flex-grow">{children}</main>
+          <main className="grow">{children}</main>
           <Toaster richColors position="top-right" />
 
           {/* Footer */}
-        
         </div>
       </body>
     </html>
