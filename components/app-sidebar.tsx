@@ -47,6 +47,7 @@ const data = {
     {
       title: "Dashboard",
       url: "/dashboard",
+      href:" #dahsboard",
       icon: LayoutDashboard,
       // Hapus 'isActive' yang di-hardcode
     },

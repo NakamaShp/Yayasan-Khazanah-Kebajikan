@@ -94,7 +94,7 @@ export default async function WidgetDashboard() {
 
   // --- 3. Render JSX ---
   return (
-    <div className="space-y-6">
+    <div id="dashboard" className="space-y-6">
       
       {/* --- Widget 1: Selamat Datang --- */}
       <Card>
