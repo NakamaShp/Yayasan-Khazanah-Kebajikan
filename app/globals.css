@@ -20,6 +20,28 @@ html {
 
 /* === THEME VARIABLES === */
 :root {
+
+  /* ... (variabel shadcn Anda yang lain) ... */
+
+    /* ======================================= */
+    /* === TEMA SIDEBAR MODERN (ala Devias) === */
+    /* ======================================= */
+    
+    /* Latar belakang Sidebar (Biru Navy Gelap) */
+    --color-sidebar-bg: 222 47% 11%; /* hsl(222, 47%, 11%) */
+    
+    /* Teks biasa di sidebar (Abu-abu lembut) */
+    --color-sidebar-text: 215 14% 63%; /* hsl(215, 14%, 63%) */
+    
+    /* Teks saat hover atau aktif (Putih) */
+    --color-sidebar-text-active: 0 0% 100%; /* hsl(0, 0%, 100%) */
+    
+    /* Latar belakang saat item di-hover */
+    --color-sidebar-hover-bg: 215 28% 17%; /* hsl(215, 28%, 17%) */
+    
+    /* Latar belakang item yang aktif (Biru Primer) */
+    --color-sidebar-active-bg: 217 91% 60%; /* hsl(217, 91%, 60%) */
+  
   /* === Light Mode === */
   --background: oklch(0.98 0.01 250); /* hampir putih */
   --foreground: oklch(0.25 0.03 250); /* biru tua keabu-abuan */
@@ -39,24 +61,27 @@ html {
   --input: oklch(0.9 0.02 250);
   --ring: oklch(0.623 0.233 259.815); /* Blue 600 */
 
-  /* Chart dan sidebar */
+  /* Chart */
   --chart-1: oklch(0.623 0.233 259.815);
   --chart-2: oklch(0.68 0.18 260);
   --chart-3: oklch(0.57 0.2 255);
   --chart-4: oklch(0.75 0.14 250);
   --chart-5: oklch(0.6 0.16 265);
 
-  --sidebar: oklch(0.98 0.01 250);
-  --sidebar-foreground: oklch(0.25 0.03 250);
-  --sidebar-primary: oklch(0.623 0.233 259.815);
-  --sidebar-primary-foreground: oklch(0.98 0.01 250);
-  --sidebar-accent: oklch(0.9 0.02 250);
-  --sidebar-accent-foreground: oklch(0.25 0.03 250);
-  --sidebar-border: oklch(0.9 0.02 250);
-  --sidebar-ring: oklch(0.623 0.233 259.815);
+  /* --- PERBAIKAN SIDEBAR (LIGHT MODE) --- */
+  /* Nilai HSL Anda (217 89% 37%) dikonversi ke nilai OKLCH */
+  --sidebar: 0.46 0.16 251; /* OKLCH untuk HSL(217, 89%, 37%) */
+  --sidebar-foreground: 0.99 0.003 251; /* OKLCH untuk HSL(210, 40%, 98%) */
+  --sidebar-primary: var(--primary); /* Menggunakan primary Anda */
+  --sidebar-primary-foreground: var(--primary-foreground); /* Menggunakan primary Anda */
+  --sidebar-accent: 0.38 0.14 251; /* OKLCH untuk HSL(217, 89%, 30%) */
+  --sidebar-accent-foreground: 0.99 0.003 251; /* OKLCH untuk HSL(210, 40%, 98%) */
+  --sidebar-border: 0.38 0.14 251; /* Border disamakan dengan accent */
+  --sidebar-ring: var(--ring); /* Menggunakan ring Anda */
 }
 
 /* === INLINE THEME === */
+/* Blok ini sudah benar, memetakan var Anda ke template */
 @theme inline {
   --radius-sm: 0.25rem;
   --radius-md: 0.375rem;
@@ -105,14 +130,25 @@ html {
   --input: oklch(0.3 0.04 250);
   --ring: oklch(0.623 0.233 259.815);
 
-  --sidebar: oklch(0.15 0.03 250);
-  --sidebar-foreground: oklch(0.95 0.02 250);
-  --sidebar-primary: oklch(0.623 0.233 259.815);
-  --sidebar-primary-foreground: oklch(0.12 0.03 250);
-  --sidebar-accent: hsl(240 3.7% 15.9%);
-  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-  --sidebar-border: hsl(240 3.7% 15.9%);
-  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  /* --- PERBAIKAN SIDEBAR (DARK MODE) --- */
+  /* Menggunakan variabel dari tema gelap Anda yang sudah ada */
+  --sidebar: var(--background); /* Latar sidebar = latar body */
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent); /* Hover/aktif = warna accent */
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border); /* Border = warna border */
+  --sidebar-ring: var(--ring);
+
+
+  /* ... (variabel dark mode Anda yang lain) ... */
+    
+    --color-sidebar-bg: 222 47% 11%;
+    --color-sidebar-text: 215 14% 63%;
+    --color-sidebar-text-active: 0 0% 100%;
+    --color-sidebar-hover-bg: 215 28% 17%;
+    --color-sidebar-active-bg: 217 91% 60%;
 }
 
 /* === REAPPLY BASE AFTER OVERRIDE === */

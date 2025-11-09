@@ -1,5 +1,6 @@
-import Link from "next/link";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -10,17 +11,13 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Newspaper,
-  Star,
-  CalendarClock,
-  User,
-} from "lucide-react";
+import { Newspaper, Star, CalendarClock } from "lucide-react";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { format, formatDistanceToNow } from "date-fns";
 import { id as indonesianLocale } from "date-fns/locale";
-import { useMemo } from "react";
+import Link from "next/link";
 
-// Interface untuk data yang kita fetch
+// Tipe data berita
 interface RecentBerita {
   id: string;
   judul: string;
@@ -28,160 +25,157 @@ interface RecentBerita {
   created_at: string;
 }
 
-// Helper untuk format tanggal (Contoh: "2 jam lalu" atau "10 Nov 2025")
 const formatDate = (dateString: string) => {
-
   const date = new Date(dateString);
   const now = new Date();
-  // Jika kurang dari 7 hari, tampilkan format relatif (mis: 2 hari lalu)
   if (now.getTime() - date.getTime() < 7 * 24 * 60 * 60 * 1000) {
-    return formatDistanceToNow(date, {
-      addSuffix: true,
-      locale: indonesianLocale,
-    });
+    return formatDistanceToNow(date, { addSuffix: true, locale: indonesianLocale });
   }
-  // Jika lebih, tampilkan tanggal (mis: 10 Nov 2025)
   return format(date, "d MMM yyyy", { locale: indonesianLocale });
 };
 
-// Helper untuk mengambil inisial nama
 const getInitials = (name?: string | null) => {
-  if (!name) return "A"; // Admin default
-  const names = name.split(" ");
+  if (!name) return "A";
+  const names = name.trim().split(/\s+/);
   if (names.length > 1) {
     return `${names[0][0]}${names[1][0]}`.toUpperCase();
   }
-  return names[0].substring(0, 2).toUpperCase();
+  return names[0].slice(0, 2).toUpperCase();
 };
 
-/**
- * =======================
- * Halaman Dashboard (Server Component)
- * =======================
- */
-export default async function WidgetDashboard() {
+export default function WidgetDashboard() {
   const supabase = createSupabaseBrowserClient();
-  
-  // --- 1. Data Fetching ---
-  // Kita akan fetch semua data secara paralel untuk performa
-  const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-  const [
-    totalResult,
-    unggulanResult,
-    bulanIniResult,
-    recentResult
-  ] = await Promise.allSettled([
-    // a. Hitung total berita
-    supabase.from("berita").select("*", { count: "exact", head: true }),
-    // b. Hitung berita unggulan
-    supabase.from("berita").select("*", { count: "exact", head: true }).eq("is_unggulan", true),
-    // c. Hitung berita bulan ini
-    supabase.from("berita").select("*", { count: "exact", head: true }).gte("created_at", startOfMonth),
-    // d. Ambil 5 berita terbaru
-    supabase.from("berita").select("id, judul, penulis, created_at").order("created_at", { ascending: false }).limit(5)
-  ]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [unggulanCount, setUnggulanCount] = useState(0);
+  const [bulanIniCount, setBulanIniCount] = useState(0);
+  const [recentBerita, setRecentBerita] = useState<RecentBerita[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // --- 2. Proses Data ---
-  // Kita gunakan 'allSettled' agar jika 1 query gagal, halaman tidak crash
-  const totalCount = totalResult.status === 'fulfilled' ? (totalResult.value.count ?? 0) : 0;
-  const unggulanCount = unggulanResult.status === 'fulfilled' ? (unggulanResult.value.count ?? 0) : 0;
-  const bulanIniCount = bulanIniResult.status === 'fulfilled' ? (bulanIniResult.value.count ?? 0) : 0;
-  const recentBerita: RecentBerita[] = recentResult.status === 'fulfilled' ? (recentResult.value.data as RecentBerita[] ?? []) : [];
-  
-  const today = format(now, "eeee, d MMMM yyyy", { locale: indonesianLocale });
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-  // --- 3. Render JSX ---
-  return (
-    <div id="dashboard" className="space-y-6">
-      
-      {/* --- Widget 1: Selamat Datang --- */}
-      <Card>
+      const [
+        totalResult,
+        unggulanResult,
+        bulanIniResult,
+        recentResult,
+      ] = await Promise.allSettled([
+        supabase.from("berita").select("*", { count: "exact", head: true }),
+        supabase.from("berita").select("*", { count: "exact", head: true }).eq("is_unggulan", true),
+        supabase.from("berita").select("*", { count: "exact", head: true }).gte("created_at", startOfMonth),
+        supabase
+          .from("berita")
+          .select("id, judul, penulis, created_at")
+          .order("created_at", { ascending: false })
+          .limit(5),
+      ]);
+
+      setTotalCount(totalResult.status === "fulfilled" ? totalResult.value.count ?? 0 : 0);
+      setUnggulanCount(unggulanResult.status === "fulfilled" ? unggulanResult.value.count ?? 0 : 0);
+      setBulanIniCount(bulanIniResult.status === "fulfilled" ? bulanIniResult.value.count ?? 0 : 0);
+      setRecentBerita(
+        recentResult.status === "fulfilled" && Array.isArray(recentResult.value.data)
+          ? recentResult.value.data
+          : []
+      );
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [supabase]);
+
+  const today = format(new Date(), "eeee, d MMMM yyyy", { locale: indonesianLocale });
+
+  if (loading) return <div>Loading...</div>;
+
+   return (
+    <div id="dashboard" className="space-y-8">
+      {/* Welcome Widget */}
+      <Card className="bg-gradient-to-r from-indigo-100 via-purple-50 to-white shadow-xl rounded-2xl border border-indigo-100 hover:shadow-2xl transition-all duration-200">
         <CardHeader>
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
             <div>
-              <CardTitle className="text-2xl">Selamat Datang, Admin!</CardTitle>
-              <CardDescription>
-                Berikut adalah ringkasan singkat untuk hari ini, {today}.
+              <CardTitle className="text-3xl font-black text-indigo-700 drop-shadow">
+                Selamat Datang, Admin!
+              </CardTitle>
+              <CardDescription className="text-indigo-500 font-medium mt-2">
+                Berikut adalah ringkasan singkat untuk hari ini,
+                <span className="font-bold text-purple-500 ml-1">{today}</span>.
               </CardDescription>
             </div>
-            {/* Ganti "Admin" dengan nama user jika ada logic auth */}
-            <Avatar>
-              <AvatarFallback>AD</AvatarFallback> 
+            <Avatar className="h-12 w-12 shadow-lg ring-2 ring-indigo-300">
+              <AvatarFallback>AD</AvatarFallback>
             </Avatar>
           </div>
         </CardHeader>
       </Card>
 
-      {/* --- Widget 2: Statistik (KPI) --- */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {/* Stat Card: Total Berita */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Berita</CardTitle>
-            <Newspaper className="h-4 w-4 text-muted-foreground" />
+      {/* Statistik Widget Responsive */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card className="group bg-white/90 border border-indigo-50 shadow-xl rounded-xl px-2 py-4 hover:bg-indigo-50 transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-base font-semibold text-slate-700">Total Berita</CardTitle>
+            <Newspaper className="h-6 w-6 text-indigo-500 group-hover:scale-110 transition-all" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalCount}</div>
-            <p className="text-xs text-muted-foreground">
-              Total semua artikel yang dipublikasi
-            </p>
+            <div className="text-3xl font-black text-indigo-700">{totalCount}</div>
+            <p className="text-xs text-slate-500 mt-2">Total semua artikel yang dipublikasi</p>
           </CardContent>
         </Card>
-
-        {/* Stat Card: Berita Unggulan */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Berita Unggulan</CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
+        <Card className="group bg-white/90 border border-yellow-50 shadow-xl rounded-xl px-2 py-4 hover:bg-yellow-50 transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-base font-semibold text-slate-700">Berita Unggulan</CardTitle>
+            <Star className="h-6 w-6 text-yellow-500 group-hover:scale-110 transition-all" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{unggulanCount}</div>
-            <p className="text-xs text-muted-foreground">
-              Artikel yang ditandai sebagai unggulan
-            </p>
+            <div className="text-3xl font-black text-yellow-500">{unggulanCount}</div>
+            <p className="text-xs text-slate-500 mt-2">Artikel yang ditandai sebagai unggulan</p>
           </CardContent>
         </Card>
-
-        {/* Stat Card: Berita Bulan Ini */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Berita Bulan Ini</CardTitle>
-            <CalendarClock className="h-4 w-4 text-muted-foreground" />
+        <Card className="group bg-white/90 border border-purple-50 shadow-xl rounded-xl px-2 py-4 hover:bg-purple-50 transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-base font-semibold text-slate-700">Berita Bulan Ini</CardTitle>
+            <CalendarClock className="h-6 w-6 text-purple-500 group-hover:scale-110 transition-all" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+{bulanIniCount}</div>
-            <p className="text-xs text-muted-foreground">
-              Artikel baru di bulan ini
-            </p>
+            <div className="text-3xl font-black text-purple-700">+{bulanIniCount}</div>
+            <p className="text-xs text-slate-500 mt-2">Artikel baru di bulan ini</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* --- Widget 3: Aktivitas Terbaru --- */}
-      <Card>
+      {/* Recent News Widget */}
+      <Card className="bg-white/90 border border-indigo-50 rounded-2xl shadow-xl hover:bg-indigo-50 transition-all duration-200">
         <CardHeader>
-          <CardTitle>Aktivitas Berita Terbaru</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-xl font-bold text-indigo-700">
+            Aktivitas Berita Terbaru
+          </CardTitle>
+          <CardDescription className="text-slate-500">
             5 berita terakhir yang ditambahkan ke sistem.
           </CardDescription>
         </CardHeader>
         <CardContent>
           {recentBerita.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Belum ada berita.</p>
+            <p className="text-sm text-slate-400">Belum ada berita.</p>
           ) : (
             <div className="space-y-4">
               {recentBerita.map((berita) => (
-                <div key={berita.id} className="flex items-center gap-4">
-                  <Avatar className="h-9 w-9">
+                <div
+                  key={berita.id}
+                  className="flex items-center gap-3 bg-slate-100 rounded-lg p-2 hover:bg-indigo-100 transition-all duration-200"
+                >
+                  <Avatar className="h-9 w-9 ring-2 ring-indigo-200">
                     <AvatarFallback>{getInitials(berita.penulis)}</AvatarFallback>
                   </Avatar>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium leading-none line-clamp-1">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold leading-none line-clamp-1 text-slate-700">
                       {berita.judul}
                     </p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs text-slate-500 truncate">
                       {berita.penulis ?? "Admin"} • {formatDate(berita.created_at)}
                     </p>
                   </div>
@@ -192,8 +186,10 @@ export default async function WidgetDashboard() {
         </CardContent>
         <CardFooter>
           <Link href="/admin/berita" className="w-full">
-            <Button variant="outline" className="w-full">
-              <Newspaper className="mr-2 h-4 w-4" />
+            <Button
+              className="w-full bg-gradient-to-r from-indigo-500 via-purple-400 to-yellow-300 text-white font-bold px-4 py-2 rounded-lg shadow-lg hover:scale-105 transition flex gap-2 items-center"
+            >
+              <Newspaper className="h-5 w-5" />
               Kelola Semua Berita
             </Button>
           </Link>
