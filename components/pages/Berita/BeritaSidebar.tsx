@@ -2,13 +2,19 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { Newspaper, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { createClient } from "@supabase/supabase-js";
 
 interface Props {
   currentSlug: string;
 }
 
-export default async function BeritaSidebar({ currentSlug }: Props) {
-  const supabase = await createSupabaseServerClient();
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+export default async function BeritaSidebar({
+  currentSlug,
+}: Props) {
 
   // Ambil 5 berita terbaru
   const { data: beritas } = await supabase
@@ -18,8 +24,14 @@ export default async function BeritaSidebar({ currentSlug }: Props) {
     .limit(6); // Ambil 6, kalau-kalau salah satunya adalah yg sedang dibuka
 
   // Filter berita saat ini dari daftar
-  const recentBeritas =
-    beritas?.filter((b) => b.slug !== currentSlug).slice(0, 5) ?? [];
+  interface Berita {
+    judul: string;
+    slug: string;
+    created_at: string;
+  }
+
+  const recentBeritas: Berita[] =
+    beritas?.filter((b: Berita) => b.slug !== currentSlug).slice(0, 5) ?? [];
 
   return (
     <aside className="sticky top-24">
