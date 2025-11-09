@@ -1,19 +1,11 @@
-import { createServerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-
+// lib/supabase/server.ts
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export function createSupabaseServerClient(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const cookieStore = await cookies(); // <- pastikan await!
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: cookieStore,
-    }
-  );
+/**
+ * Membuat Supabase client menggunakan req dan res dari context Next.js Pages Router (API Route / getServerSideProps)
+ * Harus dipanggil dengan argumen request dan response HTTP.
+ */
+export function createSupabaseServerClient(req: NextApiRequest, res: NextApiResponse) {
+  return createPagesServerClient({ req, res });
 }
