@@ -9,6 +9,7 @@ export default function Footer() {
     { name: "Galeri", href: "/galeri" },
     { name: "Berita", href: "/berita" },
     { name: "Kontak", href: "/kontak" },
+    { name: "admin", href: "/dashboard" },
   ];
 
   return (

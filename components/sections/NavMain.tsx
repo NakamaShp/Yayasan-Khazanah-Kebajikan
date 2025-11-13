@@ -20,9 +20,9 @@ export default function Navbar() {
 
   return (
     <header className="px-4 sm:px-10 fixed top-0 left-0 w-full z-50 backdrop-blur-lg bg-white/50 border-b border-white/20 shadow-sm">
-      <div className="max-w-7xl mx-auto flex justify-between items-center md:px-8 py-3">
+      <div className="max-w-7xl mx-auto flex justify-between  md:px-8 py-3">
         {/* 🔹 Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-start justify-start gap-2">
           <motion.span
             className="font-extrabold text-lg md:text-xl bg-gradient-to-r from-blue-600 to-amber-500 bg-clip-text text-transparent tracking-tight"
             initial={{ opacity: 0, y: -10 }}

@@ -40,7 +40,7 @@ export function AboutPage() {
           <div className="relative w-72 h-72 md:w-80 md:h-80 bg-gradient-to-tr from-blue-500 to-blue-300 rounded-3xl shadow-xl overflow-hidden">
             <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-3xl" />
             <Image
-              src="/images/about-illustration.png"
+              src="/images/about/icon.jpg"
               alt="Tentang Yayasan"
               fill
               className="object-cover opacity-90 mix-blend-overlay"

@@ -35,10 +35,10 @@ export default function DashboardLayout({
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-white transition-colors">
       {/* Sidebar Desktop Fixed */}
       <aside className="hidden md:flex fixed top-0 left-0 h-screen w-[260px] flex-col border-r bg-white dark:bg-slate-900 shadow-lg z-20">
-        <div className="h-16 flex items-center border-b px-6">
+        <div className="h-16 flex justify-start border-b px-6">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 font-bold text-indigo-600"
+            className="flex items-center ap-2 font-bold text-indigo-600"
           >
             <Package2 className="h-7 w-7 text-indigo-500" />
             <span>Khazanah Admin</span>

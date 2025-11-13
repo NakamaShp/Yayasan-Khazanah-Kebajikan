@@ -15,13 +15,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Toaster, toast } from "sonner"; // Impor Toaster & toast
+import Link from "next/link";
+import { CircleChevronLeft } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  
+
   // Buat instance klien Supabase di dalam komponen
   const supabase = createSupabaseBrowserClient();
 
@@ -41,19 +43,25 @@ export default function LoginPage() {
       toast.error(`Login Gagal: ${error.message}`);
     } else {
       toast.success("Login Berhasil! Mengarahkan...");
-      
+
       // Paksa refresh untuk membersihkan cache router
       // dan redirect ke dashboard (ditangani oleh middleware)
       router.push("/dashboard");
-      router.refresh(); 
+      router.refresh();
     }
   };
 
   return (
     <>
-      <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-950">
-        <Card className="w-full max-w-sm">
+      <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-950 ">
+        <Card className="w-full max-w-sm items-center">
           <form onSubmit={handleLogin}>
+            <Link href="/">
+              <Button className="flex pl-2 bg-blend-soft-light">
+                <CircleChevronLeft />
+                Kembali ke beranda
+              </Button>
+            </Link>
             <CardHeader>
               <CardTitle className="text-2xl">Login Admin</CardTitle>
               <CardDescription>
@@ -91,7 +99,6 @@ export default function LoginPage() {
           </form>
         </Card>
       </div>
-  
     </>
   );
 }
