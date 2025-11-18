@@ -14,6 +14,8 @@ const navItems = [
   { name: "Berita", href: "/berita" },
 ];
 
+const ctaItems = [{ name: "Donasi", href: "/donasi" }];
+
 export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -51,9 +53,13 @@ export default function Navbar() {
 
         {/* 🔹 Button CTA */}
         <div className="hidden md:block">
-          <Button className="bg-orange-500 text-white hover:bg-orange-400 rounded-full px-8 shadow-lg hover:shadow-xl transition-all">
-            Donasi Sekarang
-          </Button>
+          {ctaItems.map((i) => (
+            <Link key={i.name} href={i.href}>
+              <Button className="bg-orange-500 text-white hover:bg-orange-400 rounded-full px-8 shadow-lg hover:shadow-xl transition-all">
+                Donasi Sekarang
+              </Button>
+            </Link>
+          ))}
         </div>
 
         {/* 🔹 Hamburger Menu */}
@@ -85,9 +91,13 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
-            <Button className="mt-3 bg-blue-700 text-white hover:bg-blue-800 rounded-full px-8 shadow-lg hover:shadow-xl transition-all">
-              Donasi Sekarang
-            </Button>
+            {ctaItems.map((i) => (
+              <Link key={i.name} href={i.href} onClick={() => setIsOpen(false)}>
+                <Button className="mt-3 bg-blue-700 text-white justify-center align-center-items hover:bg-blue-800 rounded-full px-8 shadow-lg hover:shadow-xl transition-all">
+                  Donasi Sekarang
+                </Button>
+              </Link>
+            ))}
           </nav>
         </motion.div>
       )}

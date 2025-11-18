@@ -48,6 +48,12 @@ const headerConfig: Record<string, HeaderConfig> = {
       "Kami terbuka untuk pertanyaan, aspirasi, dan kolaborasi demi kemajuan pendidikan.",
     breadcrumb: ["Beranda", "Kontak"],
   },
+  "/donasi": {
+    title: "Ayo Berbagi Kebaikan",
+    subtitle:
+      "Setiap donasi Anda adalah investasi untuk melahirkan generasi santri yang berilmu, berakhlak, dan bermanfaat bagi umat.",
+    breadcrumb: ["Beranda", "Donasi"],
+  },
 };
 
 export default function HeaderPage() {
@@ -55,17 +61,11 @@ export default function HeaderPage() {
   const config = headerConfig[pathname] || headerConfig["/"];
 
   return (
-    
-    
     <header className="relative overflow-hidden bg-gradient-to-br from-sky-100 via-indigo-500 to-blue-600 text-white pt-28 pb-32 md:pb-40">
-      
-      
       {/* Dekorasi lembut */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.08)_0%,transparent_80%)]" />
       <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl opacity-30" />
       <div className="absolute bottom-10 left-[-50px] w-80 h-80 bg-blue-300/20 rounded-full blur-3xl opacity-40" />
-
-  
 
       {/* Konten utama */}
       <div className="relative container mx-auto px-6 text-center max-w-3xl">

@@ -33,7 +33,7 @@ export default function RootLayout({
 
           {/* Konten Utama */}
           <main className="grow">{children}</main>
-          <Toaster richColors position="top-right" />
+          <Toaster richColors position="top-center" />
 
           {/* Footer */}
         </div>
