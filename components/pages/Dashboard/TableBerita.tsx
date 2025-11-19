@@ -475,21 +475,43 @@ const UpdateBeritaForm: React.FC<UpdateFormProps> = ({
         const slug = generateSlug(judul);
         const fileExt = thumbnail.name.split(".").pop();
         const fileName = `${slug}-${Date.now()}.${fileExt}`;
-        const filePath = `berita-images/berita/${fileName}`;
+        const bucketName = "berita-images"; // Tentukan nama bucket
+        const filePath = `berita/${fileName}`; // Path yang benar di dalam bucket
 
-        // Hapus thumbnail lama dari storage jika ada dan jika berbeda
-        if (oldThumbnail && oldThumbnail.includes(supabase.storage.url)) {
-          const oldPath = oldThumbnail.split("berita-images/").pop();
-          await supabase.storage.from("berita-images").remove([oldPath!]);
+        // --- Pengecekan dan Penghapusan Thumbnail Lama (Solusi Error 2445) ---
+        // Cek apakah URL lama benar-benar URL public Supabase storage
+        if (oldThumbnail && oldThumbnail.includes(`/${bucketName}/`)) {
+          // Ekstrak path file yang perlu dihapus (semua setelah nama bucket)
+          // Contoh: public/berita-images/berita/file-lama.jpg
+          const pathParts = oldThumbnail.split(`/${bucketName}/`);
+          if (pathParts.length > 1) {
+            // Path yang didapatkan adalah 'berita/file-lama.jpg'
+            const oldFilePath = pathParts[1];
+
+            const { error: removeError } = await supabase.storage
+              .from(bucketName)
+              // Remove membutuhkan array path relatif dari root bucket
+              .remove([oldFilePath]);
+
+            if (removeError) {
+              // Biasanya tidak perlu melempar error di sini, cukup log saja
+              console.warn(
+                "Gagal menghapus file lama di storage:",
+                removeError
+              );
+            }
+          }
         }
+        // --- Akhir Pengecekan ---
 
         const { error: uploadError } = await supabase.storage
-          .from("berita-images")
+          .from(bucketName)
           .upload(filePath, thumbnail, { upsert: true });
         if (uploadError) throw uploadError;
 
+        // Dapatkan URL Public baru (Supabase.co/storage/v1/object/public/...)
         const { data: urlData } = supabase.storage
-          .from("berita-images")
+          .from(bucketName)
           .getPublicUrl(filePath);
         if (!urlData) throw new Error("Gagal mendapatkan public URL gambar.");
         urlFinal = urlData.publicUrl;
